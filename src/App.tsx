@@ -702,15 +702,15 @@ export default function App() {
                       </div>
                       <div className="space-y-1">
                         <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Phone Number</p>
-                        <p className="font-bold text-slate-800">+1 (555) 012-3456</p>
+                        <p className="font-bold text-slate-800">7382616050</p>
                       </div>
                       <div className="space-y-1">
                         <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Date of Birth</p>
-                        <p className="font-bold text-slate-800">January 15, 2004</p>
+                        <p className="font-bold text-slate-800">January 15, 2008</p>
                       </div>
                       <div className="space-y-1 md:col-span-2">
                         <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Address</p>
-                        <p className="font-bold text-slate-800">123 University Ave, Academic City, AC 94103</p>
+                        <p className="font-bold text-slate-800">Bhoj Reddy Engineering College for Women</p>
                       </div>
                     </div>
                   </section>
