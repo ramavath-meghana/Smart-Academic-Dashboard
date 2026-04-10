@@ -22,6 +22,20 @@ export default function App() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('Dashboard');
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  const handleAction = (e: FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(true); // Keep loading for a bit
+      setTimeout(() => {
+        setIsLoading(false);
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
+      }, 800);
+    }, 200);
+  };
 
   const handleLogin = (e: FormEvent) => {
     e.preventDefault();
@@ -53,7 +67,7 @@ export default function App() {
               <GraduationCap className="w-10 h-10 text-white" />
             </div>
             <h1 className="text-3xl font-bold text-slate-800 tracking-tight">Smart Academic</h1>
-            <p className="text-slate-500 text-sm mt-1 uppercase tracking-widest font-medium">Dashboard v2.0</p>
+            <p className="text-slate-500 text-sm mt-1 uppercase tracking-widest font-medium">Dashboard v3.0</p>
           </div>
 
           {/* Login Card */}
@@ -347,10 +361,22 @@ export default function App() {
                           placeholder="Type your doubt or specific question..." 
                           className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500/20 min-h-[150px] outline-none"
                         />
-                        <button className="absolute bottom-4 right-4 bg-blue-600 text-white px-6 py-2 rounded-xl font-bold text-sm shadow-lg shadow-blue-500/20">
-                          Submit Feedback
+                        <button 
+                          onClick={handleAction}
+                          className="absolute bottom-4 right-4 bg-blue-600 text-white px-6 py-2 rounded-xl font-bold text-sm shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition-colors"
+                        >
+                          {isLoading ? 'Submitting...' : 'Submit Feedback'}
                         </button>
                       </div>
+                      {showSuccess && (
+                        <motion.p 
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="text-emerald-600 text-sm font-bold text-center"
+                        >
+                          Feedback submitted successfully!
+                        </motion.p>
+                      )}
                     </div>
                   </section>
                 ) : (
@@ -448,9 +474,41 @@ export default function App() {
                           <label className="block text-xs font-bold text-slate-400 uppercase mb-2 ml-1">Description</label>
                           <textarea placeholder="Instructions for students..." className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-purple-500/20 min-h-[100px]" />
                         </div>
-                        <button className="w-full bg-purple-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-purple-500/20 hover:bg-purple-700 transition-colors">
-                          Post Assignment
+                        
+                        {/* Automatic Reminders Feature */}
+                        <div className="bg-purple-50 p-4 rounded-2xl border border-purple-100 space-y-3">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <Bell className="w-4 h-4 text-purple-600" />
+                              <span className="text-xs font-bold text-purple-900 uppercase tracking-wider">Auto Reminders</span>
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer">
+                              <input type="checkbox" className="sr-only peer" defaultChecked />
+                              <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-purple-600"></div>
+                            </label>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <select className="bg-white border border-purple-200 rounded-lg text-[10px] font-bold p-2 outline-none">
+                              <option>2 Days Before</option>
+                              <option>1 Day Before</option>
+                              <option>6 Hours Before</option>
+                            </select>
+                            <select className="bg-white border border-purple-200 rounded-lg text-[10px] font-bold p-2 outline-none">
+                              <option>Every 12 Hours</option>
+                              <option>Once Daily</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <button 
+                          onClick={handleAction}
+                          className="w-full bg-purple-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-purple-500/20 hover:bg-purple-700 transition-colors"
+                        >
+                          {isLoading ? 'Posting...' : 'Post Assignment'}
                         </button>
+                        {showSuccess && (
+                          <p className="text-emerald-600 text-xs font-bold text-center">Assignment posted and reminders scheduled!</p>
+                        )}
                       </div>
                     </section>
 
@@ -557,7 +615,13 @@ export default function App() {
                       <label className="block text-xs font-bold text-slate-400 uppercase mb-2">Description</label>
                       <textarea placeholder="Describe the issue in detail..." className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-blue-500/20 min-h-[150px]" />
                     </div>
-                    <button className="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-blue-500/20">Submit Complaint</button>
+                    <button 
+                      onClick={handleAction}
+                      className="w-full bg-blue-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition-colors"
+                    >
+                      {isLoading ? 'Submitting...' : 'Submit Complaint'}
+                    </button>
+                    {showSuccess && <p className="text-emerald-600 text-sm font-bold text-center mt-2">Complaint submitted successfully!</p>}
                   </div>
                 </section>
 
@@ -579,7 +643,13 @@ export default function App() {
                         <input type="date" className="w-full pl-12 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-blue-500/20" />
                       </div>
                     </div>
-                    <button className="w-full bg-purple-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-purple-500/20">Submit Leave Request</button>
+                    <button 
+                      onClick={handleAction}
+                      className="w-full bg-purple-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-purple-500/20 hover:bg-purple-700 transition-colors"
+                    >
+                      {isLoading ? 'Submitting...' : 'Submit Leave Request'}
+                    </button>
+                    {showSuccess && <p className="text-emerald-600 text-sm font-bold text-center mt-2">Leave request submitted!</p>}
                   </div>
                 </section>
               </motion.div>
