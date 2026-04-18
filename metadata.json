@@ -1,5 +1,5 @@
 {
-  "name": "Academic Dashboard",
-  "description": "A clean and professional academic dashboard with smart image generation capabilities.",
+  "name": "Simple Smart Dashboard",
+  "description": "A minimal and human-readable academic dashboard built with HTML, CSS, JS, and Node.js.",
   "requestFramePermissions": []
 }

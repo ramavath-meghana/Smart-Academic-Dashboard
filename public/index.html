@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Academic Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="login-screen" class="container">
+        <div class="card">
+            <h2>School Login</h2>
+            <form id="login-form">
+                <input type="text" id="username" placeholder="Username" required>
+                <select id="role">
+                    <option value="student">Student</option>
+                    <option value="teacher">Teacher</option>
+                </select>
+                <button type="submit">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard Screen (Hidden by default) -->
+    <div id="dashboard-screen" class="container hidden">
+        <header>
+            <h1 id="welcome-text">Welcome</h1>
+            <button id="logout-btn">Logout</button>
+        </header>
+
+        <main>
+            <!-- Assignments Section -->
+            <section class="card">
+                <h3>Assignments</h3>
+                <ul id="assignment-list">
+                    <li>Loading assignments...</li>
+                </ul>
+            </section>
+
+            <!-- Feedback Section (Only for Students) -->
+            <section id="feedback-section" class="card">
+                <h3>Class Feedback</h3>
+                <p>How was today's class?</p>
+                <div class="feedback-buttons">
+                    <button class="feedback-btn" data-val="Understood">Understood</button>
+                    <button class="feedback-btn" data-val="Confused">Confused</button>
+                    <button class="feedback-btn" data-val="Too Fast">Too Fast</button>
+                </div>
+                <div id="feedback-success" class="hidden text-success">Thanks for your feedback!</div>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
