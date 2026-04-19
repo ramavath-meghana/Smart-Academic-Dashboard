@@ -15,7 +15,7 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
     setError('');
 
     try {
-      const res = await fetch('/api/login', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, password, role }),
