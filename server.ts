@@ -13,7 +13,10 @@ app.use(cors());
 app.use(express.json());
 
 // ---------------- MYSQL CONNECTION ----------------
-const db = mysql.createConnection(process.env.MYSQL_URL);
+if (!process.env.MYSQL_PUBLIC_URL) {
+  throw new Error("MYSQL_PUBLIC_URL environment variable is not set");
+}
+const db = mysql.createConnection(process.env.MYSQL_PUBLIC_URL);
 
 db.connect((err) => {
   if (err) {
