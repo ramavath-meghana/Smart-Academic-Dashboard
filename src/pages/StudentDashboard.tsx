@@ -31,11 +31,11 @@ export default function StudentDashboard({ user }: { user: any }) {
             <p className="text-slate-500 font-medium">Here's what's happening with your academics today.</p>
           </div>
           <div className="flex gap-4">
-            <div className="bg-white px-6 py-3 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center">
+            <div className="bg-white px-6 py-3 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center">
               <span className="text-2xl font-black text-blue-600">9.2</span>
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">CGPA</span>
             </div>
-            <div className="bg-white px-6 py-3 rounded-2xl shadow-sm border border-slate-100 flex flex-col items-center">
+            <div className="bg-white px-6 py-3 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center">
               <span className="text-2xl font-black text-purple-600">94%</span>
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Attendance</span>
             </div>
@@ -47,7 +47,7 @@ export default function StudentDashboard({ user }: { user: any }) {
           <Card title="Today's Timetable" icon={<Calendar className="w-5 h-5" />} className="lg:col-span-2">
             <div className="space-y-4">
               {data.timetable.map((item: any) => (
-                <div key={item.id} className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 transition-hover hover:bg-white hover:shadow-md">
+                <div key={item.id} className="flex items-center gap-4 p-4 bg-slate-50 rounded-xl border border-slate-100 transition-hover hover:bg-white hover:shadow-md">
                   <div className="bg-blue-500 p-3 rounded-xl text-white">
                     <Clock className="w-5 h-5" />
                   </div>
@@ -73,11 +73,11 @@ export default function StudentDashboard({ user }: { user: any }) {
                     <span className="text-slate-700">{mark.subject}</span>
                     <span className="text-blue-600">{mark.score}/{mark.total}</span>
                   </div>
-                  <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                  <div className="w-full h-2 bg-slate-100 rounded-md overflow-hidden">
                     <motion.div 
                       initial={{ width: 0 }}
                       animate={{ width: `${(mark.score / mark.total) * 100}%` }}
-                      className="h-full bg-blue-500 rounded-full"
+                      className="h-full bg-blue-500 rounded-md"
                     />
                   </div>
                 </div>

@@ -23,7 +23,7 @@ export default function DashboardView({ user }: { user: any }) {
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
       {/* Schedule Section */}
       <div className={isStudent ? "lg:col-span-8" : "lg:col-span-12"}>
-        <div className="bg-white rounded-[40px] p-10 shadow-sm border border-slate-50 h-full">
+        <div className="bg-white rounded-xl p-10 shadow-sm border border-slate-50 h-full">
           <div className="flex items-center justify-between mb-10">
             <h2 className="text-base font-black text-slate-800 tracking-tight">Today's Schedule</h2>
             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">
@@ -34,7 +34,7 @@ export default function DashboardView({ user }: { user: any }) {
           <div className="space-y-6">
             {data.timetable.slice(0, 3).map((item: any, idx: number) => (
               <div key={idx} className="flex items-center gap-6 group">
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm ${
+                <div className={`w-12 h-12 rounded-lg flex items-center justify-center shadow-sm ${
                   idx === 0 ? 'bg-[#5c67f2] text-white' : 
                   idx === 1 ? 'bg-orange-500 text-white' : 
                   'bg-[#a855f7] text-white'
@@ -81,7 +81,7 @@ export default function DashboardView({ user }: { user: any }) {
 
 function StatCard({ value, label, color }: { value: string, label: string, color: string }) {
   return (
-    <div className="bg-white rounded-[40px] p-8 shadow-sm border border-slate-50 flex flex-col items-center justify-center text-center hover:scale-105 transition-transform cursor-pointer">
+    <div className="bg-white rounded-xl p-8 shadow-sm border border-slate-50 flex flex-col items-center justify-center text-center hover:scale-105 transition-transform cursor-pointer">
       <h2 className={`text-2xl font-black ${color} mb-1`}>{value}</h2>
       <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">{label}</p>
     </div>

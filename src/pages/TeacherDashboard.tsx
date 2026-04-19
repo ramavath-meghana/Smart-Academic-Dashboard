@@ -95,7 +95,7 @@ export default function TeacherDashboard({ user }: { user: any }) {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Action Form */}
           <Card title={`Manage ${activeAction.charAt(0).toUpperCase() + activeAction.slice(1)}`} icon={<Plus className="w-5 h-5" />}>
-            <div className="flex p-1 bg-slate-100 rounded-2xl mb-6">
+            <div className="flex p-1 bg-slate-100 rounded-xl mb-6">
               <button 
                 onClick={() => setActiveAction('attendance')}
                 className={`flex-1 py-3 rounded-xl text-[10px] font-bold transition-all ${activeAction === 'attendance' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500'}`}
@@ -124,7 +124,7 @@ export default function TeacherDashboard({ user }: { user: any }) {
                     <input 
                       type="text" 
                       placeholder="e.g. S105"
-                      className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none"
+                      className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl outline-none"
                       value={studentId}
                       onChange={(e) => setStudentId(e.target.value)}
                       required
@@ -135,7 +135,7 @@ export default function TeacherDashboard({ user }: { user: any }) {
                     <input 
                       type="text" 
                       placeholder="e.g. John Doe"
-                      className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none"
+                      className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl outline-none"
                       value={studentName}
                       onChange={(e) => setStudentName(e.target.value)}
                       required
@@ -145,7 +145,7 @@ export default function TeacherDashboard({ user }: { user: any }) {
                     <label className="block text-[10px] font-bold text-slate-400 uppercase mb-2">Assign Password</label>
                     <input 
                       type="text" 
-                      className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none"
+                      className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl outline-none"
                       value={regPassword}
                       onChange={(e) => setRegPassword(e.target.value)}
                       required
@@ -157,7 +157,7 @@ export default function TeacherDashboard({ user }: { user: any }) {
                   <div>
                     <label className="block text-[10px] font-bold text-slate-400 uppercase mb-2">Select Student</label>
                     <select 
-                      className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none"
+                      className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl outline-none"
                       value={studentId}
                       onChange={(e) => setStudentId(e.target.value)}
                       required
@@ -170,7 +170,7 @@ export default function TeacherDashboard({ user }: { user: any }) {
                   <div>
                     <label className="block text-[10px] font-bold text-slate-400 uppercase mb-2">Subject</label>
                     <select 
-                      className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none"
+                      className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl outline-none"
                       value={subject}
                       onChange={(e) => setSubject(e.target.value)}
                     >
@@ -187,7 +187,7 @@ export default function TeacherDashboard({ user }: { user: any }) {
                     </label>
                     {activeAction === 'attendance' ? (
                       <select 
-                        className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none"
+                        className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl outline-none"
                         value={value}
                         onChange={(e) => setValue(e.target.value)}
                       >
@@ -198,7 +198,7 @@ export default function TeacherDashboard({ user }: { user: any }) {
                       <input 
                         type="number" 
                         placeholder="Enter score"
-                        className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none"
+                        className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl outline-none"
                         value={value}
                         onChange={(e) => setValue(e.target.value)}
                         required
@@ -217,7 +217,7 @@ export default function TeacherDashboard({ user }: { user: any }) {
               <button 
                 type="submit" 
                 disabled={submitting}
-                className={`w-full py-4 rounded-2xl font-bold text-white shadow-lg transition-all flex items-center justify-center gap-2 ${
+                className={`w-full py-4 rounded-xl font-bold text-white shadow-lg transition-all flex items-center justify-center gap-2 ${
                   activeAction === 'attendance' ? 'bg-blue-600' : activeAction === 'marks' ? 'bg-purple-600' : 'bg-emerald-600'
                 }`}
               >
@@ -230,7 +230,7 @@ export default function TeacherDashboard({ user }: { user: any }) {
           <Card title="Student Directory" icon={<Users className="w-5 h-5" />} className="lg:col-span-2">
             <div className="space-y-4">
               {students.map((student) => (
-                <div key={student.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100 group">
+                <div key={student.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100 group">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 font-bold">
                       {student.name.split(' ').map((nLine: string) => nLine[0]).join('')}

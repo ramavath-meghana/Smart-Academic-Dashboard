@@ -40,9 +40,9 @@ export default function AssignmentsView({ user }: { user: any }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
       {assignments.map((asgn) => (
-        <div key={asgn.id} className="bg-white rounded-[40px] p-10 shadow-sm border border-slate-100 flex flex-col h-full group hover:shadow-2xl hover:shadow-blue-900/5 transition-all">
+        <div key={asgn.id} className="bg-white rounded-xl p-10 shadow-sm border border-slate-100 flex flex-col h-full group hover:shadow-2xl hover:shadow-blue-900/5 transition-all">
           <div className="flex items-center gap-6 mb-8">
-            <div className={`w-14 h-14 rounded-[22px] flex items-center justify-center shadow-md ${
+            <div className={`w-14 h-14 rounded-lg flex items-center justify-center shadow-md ${
               asgn.subject.includes('Database') ? 'bg-orange-500 text-white' :
               asgn.subject.includes('Web') ? 'bg-blue-600 text-white' :
               'bg-emerald-600 text-white'
@@ -57,13 +57,13 @@ export default function AssignmentsView({ user }: { user: any }) {
             </div>
           </div>
           
-          <div className="flex items-center gap-3 mb-10 text-xs font-black text-slate-500 uppercase tracking-widest bg-slate-50 p-4 rounded-2xl border border-slate-100">
+          <div className="flex items-center gap-3 mb-10 text-xs font-black text-slate-500 uppercase tracking-widest bg-slate-50 p-4 rounded-lg border border-slate-100">
             <Calendar className="w-5 h-5 text-slate-300" />
             Due: <span className="text-slate-700">{asgn.due_date}</span>
           </div>
 
           <div className="mt-auto">
-            <div className={`w-full py-5 rounded-[22px] font-black text-[11px] uppercase tracking-widest flex items-center justify-center gap-4 transition-all shadow-xl ${
+            <div className={`w-full py-5 rounded-lg font-black text-[11px] uppercase tracking-widest flex items-center justify-center gap-4 transition-all shadow-xl ${
               asgn.status === 'Pending' ? 'bg-orange-500 text-white shadow-orange-500/30' :
               asgn.status === 'In Progress' ? 'bg-blue-600 text-white shadow-blue-500/30' :
               'bg-emerald-500 text-white shadow-emerald-500/30'
@@ -109,9 +109,9 @@ function TeacherAssignmentsView({ onRefresh }: { onRefresh: () => void }) {
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
       {/* Post New Assignment */}
       <div className="lg:col-span-5">
-        <div className="bg-white rounded-[40px] p-12 shadow-sm border border-slate-100 sticky top-10">
+        <div className="bg-white rounded-xl p-12 shadow-sm border border-slate-100 sticky top-10">
           <div className="flex items-center gap-6 mb-12">
-            <div className="w-14 h-14 bg-purple-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/20">
+            <div className="w-14 h-14 bg-purple-600 text-white rounded-lg flex items-center justify-center shadow-lg shadow-purple-500/20">
               <Plus className="w-8 h-8" />
             </div>
             <h2 className="text-lg font-black text-slate-800 tracking-tight">Post New Assignment</h2>
@@ -123,7 +123,7 @@ function TeacherAssignmentsView({ onRefresh }: { onRefresh: () => void }) {
               <input 
                 type="text" 
                 placeholder="e.g. Unit 3 Quiz"
-                className="w-full p-6 bg-slate-50 border border-slate-100 rounded-[28px] outline-none text-sm font-bold text-slate-700 focus:bg-white focus:border-purple-400 transition-all shadow-inner"
+                className="w-full p-6 bg-slate-50 border border-slate-100 rounded-lg outline-none text-sm font-bold text-slate-700 focus:bg-white focus:border-purple-400 transition-all shadow-inner"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 required
@@ -132,7 +132,7 @@ function TeacherAssignmentsView({ onRefresh }: { onRefresh: () => void }) {
             <div>
               <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-4 px-1">Subject</label>
               <select 
-                className="w-full p-6 bg-slate-50 border border-slate-100 rounded-[28px] outline-none text-sm font-bold text-slate-700 focus:bg-white focus:border-purple-400 transition-all shadow-inner"
+                className="w-full p-6 bg-slate-50 border border-slate-100 rounded-lg outline-none text-sm font-bold text-slate-700 focus:bg-white focus:border-purple-400 transition-all shadow-inner"
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
               >
@@ -145,7 +145,7 @@ function TeacherAssignmentsView({ onRefresh }: { onRefresh: () => void }) {
               <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-4 px-1">Due Date</label>
               <input 
                 type="date" 
-                className="w-full p-6 bg-slate-50 border border-slate-100 rounded-[28px] outline-none text-sm font-bold text-slate-700 focus:bg-white focus:border-purple-400 transition-all shadow-inner"
+                className="w-full p-6 bg-slate-50 border border-slate-100 rounded-lg outline-none text-sm font-bold text-slate-700 focus:bg-white focus:border-purple-400 transition-all shadow-inner"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
                 required
@@ -155,7 +155,7 @@ function TeacherAssignmentsView({ onRefresh }: { onRefresh: () => void }) {
               <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-4 px-1">Description</label>
               <textarea 
                 placeholder="Instructions for students..."
-                className="w-full p-6 bg-slate-50 border border-slate-100 rounded-[28px] outline-none text-sm font-bold text-slate-700 focus:bg-white focus:border-purple-400 transition-all shadow-inner h-32 resize-none"
+                className="w-full p-6 bg-slate-50 border border-slate-100 rounded-lg outline-none text-sm font-bold text-slate-700 focus:bg-white focus:border-purple-400 transition-all shadow-inner h-32 resize-none"
                 value={desc}
                 onChange={(e) => setDesc(e.target.value)}
               />
@@ -163,7 +163,7 @@ function TeacherAssignmentsView({ onRefresh }: { onRefresh: () => void }) {
             <button 
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-6 bg-purple-600 text-white rounded-[32px] text-xs font-black uppercase tracking-widest shadow-2xl shadow-purple-500/30 flex items-center justify-center gap-4 transition-all hover:bg-purple-700 disabled:opacity-50 hover:scale-105 active:scale-95"
+              className="w-full py-6 bg-purple-600 text-white rounded-lg text-xs font-black uppercase tracking-widest shadow-2xl shadow-purple-500/30 flex items-center justify-center gap-4 transition-all hover:bg-purple-700 disabled:opacity-50 hover:scale-105 active:scale-95"
             >
               Post Assignment
             </button>
@@ -179,9 +179,9 @@ function TeacherAssignmentsView({ onRefresh }: { onRefresh: () => void }) {
         </div>
 
         {[1, 2, 3].map((_, i) => (
-          <div key={i} className="bg-white rounded-[40px] p-10 shadow-sm border border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-6 group hover:shadow-2xl hover:shadow-purple-900/5 transition-all">
+          <div key={i} className="bg-white rounded-xl p-10 shadow-sm border border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-6 group hover:shadow-2xl hover:shadow-purple-900/5 transition-all">
             <div className="flex items-center gap-8">
-              <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-[26px] flex items-center justify-center border-2 border-blue-100 shadow-sm">
+              <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center border-2 border-blue-100 shadow-sm">
                 <BookOpen className="w-8 h-8" />
               </div>
               <div>
@@ -199,8 +199,8 @@ function TeacherAssignmentsView({ onRefresh }: { onRefresh: () => void }) {
               </div>
             </div>
             <div className="flex gap-4">
-              <button className="px-8 py-4 bg-slate-100 hover:bg-slate-200 rounded-[20px] text-[10px] font-black text-slate-600 uppercase tracking-widest transition-all">View</button>
-              <button className="px-8 py-4 bg-purple-600 text-white hover:bg-purple-700 rounded-[20px] text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-purple-500/20">Grade</button>
+              <button className="px-8 py-4 bg-slate-100 hover:bg-slate-200 rounded-lg text-[10px] font-black text-slate-600 uppercase tracking-widest transition-all">View</button>
+              <button className="px-8 py-4 bg-purple-600 text-white hover:bg-purple-700 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-purple-500/20">Grade</button>
             </div>
           </div>
         ))}

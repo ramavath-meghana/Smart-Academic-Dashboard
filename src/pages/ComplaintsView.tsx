@@ -52,9 +52,9 @@ export default function ComplaintsView({ user }: { user: any }) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
       {/* Complaint Box */}
-      <div className="bg-white rounded-[40px] p-12 shadow-sm border border-slate-100 flex flex-col h-full">
+      <div className="bg-white rounded-xl p-12 shadow-sm border border-slate-100 flex flex-col h-full">
         <div className="flex items-center gap-6 mb-12">
-          <div className="w-14 h-14 bg-blue-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+          <div className="w-14 h-14 bg-blue-600 text-white rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20">
             <ShieldAlert className="w-8 h-8" />
           </div>
           <h2 className="text-lg font-black text-slate-800 tracking-tight">Submit a Complaint</h2>
@@ -66,7 +66,7 @@ export default function ComplaintsView({ user }: { user: any }) {
             <input 
               type="text" 
               placeholder="e.g. Projector not working in Room 204"
-              className="w-full p-6 bg-slate-50 border border-slate-100 rounded-[28px] outline-none text-sm font-bold text-slate-700 focus:bg-white focus:border-blue-400 transition-all shadow-inner"
+              className="w-full p-6 bg-slate-50 border border-slate-100 rounded-lg outline-none text-sm font-bold text-slate-700 focus:bg-white focus:border-blue-400 transition-all shadow-inner"
               value={complaintTitle}
               onChange={(e) => setComplaintTitle(e.target.value)}
               required
@@ -77,7 +77,7 @@ export default function ComplaintsView({ user }: { user: any }) {
             <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-4 px-1">Description</label>
             <textarea 
               placeholder="Describe the issue in detail..."
-              className="w-full p-8 bg-slate-50 border border-slate-100 rounded-[40px] outline-none text-sm font-bold text-slate-700 focus:bg-white focus:border-blue-400 transition-all shadow-inner h-64 resize-none"
+              className="w-full p-8 bg-slate-50 border border-slate-100 rounded-xl outline-none text-sm font-bold text-slate-700 focus:bg-white focus:border-blue-400 transition-all shadow-inner h-64 resize-none"
               value={complaintDesc}
               onChange={(e) => setComplaintDesc(e.target.value)}
               required
@@ -88,7 +88,7 @@ export default function ComplaintsView({ user }: { user: any }) {
             <button 
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-6 bg-blue-600 text-white rounded-[32px] text-xs font-black uppercase tracking-widest shadow-2xl shadow-blue-500/30 flex items-center justify-center gap-4 transition-all hover:bg-blue-700 disabled:opacity-50 hover:scale-105 active:scale-95"
+              className="w-full py-6 bg-blue-600 text-white rounded-lg text-xs font-black uppercase tracking-widest shadow-2xl shadow-blue-500/30 flex items-center justify-center gap-4 transition-all hover:bg-blue-700 disabled:opacity-50 hover:scale-105 active:scale-95"
             >
               {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : 
                 submitted === 'complaint' ? <CheckCircle2 className="w-5 h-5" /> : <Send className="w-5 h-5" />}
@@ -99,9 +99,9 @@ export default function ComplaintsView({ user }: { user: any }) {
       </div>
 
       {/* Leave Request */}
-      <div className="bg-white rounded-[40px] p-12 shadow-sm border border-slate-100 flex flex-col">
+      <div className="bg-white rounded-xl p-12 shadow-sm border border-slate-100 flex flex-col">
         <div className="flex items-center gap-6 mb-12">
-          <div className="w-14 h-14 bg-purple-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/20">
+          <div className="w-14 h-14 bg-purple-600 text-white rounded-lg flex items-center justify-center shadow-lg shadow-purple-500/20">
             <FileText className="w-8 h-8" />
           </div>
           <h2 className="text-lg font-black text-slate-800 tracking-tight">Leave Request</h2>
@@ -111,7 +111,7 @@ export default function ComplaintsView({ user }: { user: any }) {
           <div>
             <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-4 px-1">Reason for Leave</label>
             <select 
-              className="w-full p-6 bg-slate-50 border border-slate-100 rounded-[28px] outline-none text-sm font-bold text-slate-700 focus:bg-white focus:border-purple-400 transition-all shadow-inner"
+              className="w-full p-6 bg-slate-50 border border-slate-100 rounded-lg outline-none text-sm font-bold text-slate-700 focus:bg-white focus:border-purple-400 transition-all shadow-inner"
               value={requestReason}
               onChange={(e) => setRequestReason(e.target.value)}
             >
@@ -128,7 +128,7 @@ export default function ComplaintsView({ user }: { user: any }) {
               <Calendar className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300" />
               <input 
                 type="date" 
-                className="w-full pl-16 pr-6 py-6 bg-slate-50 border border-slate-100 rounded-[28px] outline-none text-sm font-bold text-slate-700 focus:bg-white focus:border-purple-400 transition-all shadow-inner"
+                className="w-full pl-16 pr-6 py-6 bg-slate-50 border border-slate-100 rounded-lg outline-none text-sm font-bold text-slate-700 focus:bg-white focus:border-purple-400 transition-all shadow-inner"
                 value={requestDate}
                 onChange={(e) => setRequestDate(e.target.value)}
                 required
@@ -140,7 +140,7 @@ export default function ComplaintsView({ user }: { user: any }) {
             <button 
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-6 bg-purple-600 text-white rounded-[32px] text-xs font-black uppercase tracking-widest shadow-2xl shadow-purple-500/30 flex items-center justify-center gap-4 transition-all hover:bg-purple-700 disabled:opacity-50 hover:scale-105 active:scale-95"
+              className="w-full py-6 bg-purple-600 text-white rounded-lg text-xs font-black uppercase tracking-widest shadow-2xl shadow-purple-500/30 flex items-center justify-center gap-4 transition-all hover:bg-purple-700 disabled:opacity-50 hover:scale-105 active:scale-95"
             >
               {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : 
                 submitted === 'request' ? <CheckCircle2 className="w-5 h-5" /> : <Send className="w-5 h-5" />}
@@ -149,7 +149,7 @@ export default function ComplaintsView({ user }: { user: any }) {
           </div>
         </form>
 
-        <div className="mt-14 p-10 bg-slate-50 rounded-[40px] border border-slate-100 shadow-inner">
+        <div className="mt-14 p-10 bg-slate-50 rounded-xl border border-slate-100 shadow-inner">
           <h4 className="text-xs font-black text-slate-800 uppercase tracking-widest mb-6">Important Guidelines</h4>
           <p className="text-xs font-bold text-slate-400 leading-relaxed italic">Leave requests should be submitted at least 24 hours in advance for non-emergency situations. Approval usually takes 4-8 working hours from the Dean's office.</p>
         </div>

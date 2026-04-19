@@ -9,7 +9,7 @@ interface CardProps {
 
 export default function Card({ children, title, className = "", icon }: CardProps) {
   return (
-    <div className={`bg-white rounded-[32px] p-8 shadow-sm border border-slate-100 ${className}`}>
+    <div className={`bg-white rounded-xl p-8 shadow-sm border border-slate-100 ${className}`}>
       {title && (
         <div className="flex items-center gap-3 mb-6">
           {icon && <div className="p-2 bg-slate-50 rounded-xl text-slate-600">{icon}</div>}
