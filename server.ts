@@ -13,16 +13,20 @@ app.use(cors());
 app.use(express.json());
 
 // ---------------- MYSQL CONNECTION ----------------
-if (!process.env.MYSQL_PUBLIC_URL) {
-  throw new Error("MYSQL_PUBLIC_URL environment variable is not set");
-}
-const db = mysql.createConnection(process.env.MYSQL_PUBLIC_URL);
 
-db.connect((err) => {
+if (!process.env.MYSQL_PUBLIC_URL) {
+  throw new Error("MYSQL_PUBLIC_URL is missing in environment variables");
+}
+
+const db = mysql.createPool(process.env.MYSQL_PUBLIC_URL);
+
+// test connection
+db.getConnection((err, connection) => {
   if (err) {
     console.log("❌ MySQL connection failed:", err);
   } else {
     console.log("✅ MySQL connected");
+    connection.release();
   }
 });
 
