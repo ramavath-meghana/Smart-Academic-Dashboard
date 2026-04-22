@@ -16,10 +16,9 @@ export default function AssignmentsView({ user }: { user: any }) {
   const [loading, setLoading] = useState(true);
 
   const fetchAssignments = () => {
-    fetch(user.role === 'student' ? `/api/student-data/${user.id}` : '/api/complaints') // Mocking endpoint logic for demo
+    fetch(user.role === 'student' ? `/api/student-data/${user.id}?role=${user.role}` : '/api/assignments')
       .then(res => res.json())
       .then(d => {
-        // In a real app we'd have a specific endpoint, but let's mock it for the demo visuals
         setAssignments(d.assignments || [
           { id: 1, title: 'Database Assignment', subject: 'Database Systems', due_date: '2026-04-25', status: 'Pending' },
           { id: 2, title: 'Web Development', subject: 'CSE Lab', due_date: '2026-04-22', status: 'In Progress' },
@@ -35,12 +34,17 @@ export default function AssignmentsView({ user }: { user: any }) {
 
   if (loading) return null;
 
-  if (user.role === 'teacher') return <TeacherAssignmentsView onRefresh={fetchAssignments} />;
+  if (user.role === 'teacher') return <TeacherAssignmentsView assignments={assignments} onRefresh={fetchAssignments} />;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
       {assignments.map((asgn) => (
         <div key={asgn.id} className="bg-white rounded-xl p-10 shadow-sm border border-slate-100 flex flex-col h-full group hover:shadow-2xl hover:shadow-blue-900/5 transition-all">
+          {/** Normalize backend rows that may not include status */}
+          {(() => {
+            const status = asgn.status || 'Pending';
+            return (
+              <>
           <div className="flex items-center gap-6 mb-8">
             <div className={`w-14 h-14 rounded-lg flex items-center justify-center shadow-md ${
               asgn.subject.includes('Database') ? 'bg-orange-500 text-white' :
@@ -64,22 +68,25 @@ export default function AssignmentsView({ user }: { user: any }) {
 
           <div className="mt-auto">
             <div className={`w-full py-5 rounded-lg font-black text-[11px] uppercase tracking-widest flex items-center justify-center gap-4 transition-all shadow-xl ${
-              asgn.status === 'Pending' ? 'bg-orange-500 text-white shadow-orange-500/30' :
-              asgn.status === 'In Progress' ? 'bg-blue-600 text-white shadow-blue-500/30' :
+              status === 'Pending' ? 'bg-orange-500 text-white shadow-orange-500/30' :
+              status === 'In Progress' ? 'bg-blue-600 text-white shadow-blue-500/30' :
               'bg-emerald-500 text-white shadow-emerald-500/30'
             }`}>
-              {asgn.status === 'Completed' && <CheckCircle2 className="w-5 h-5" />}
-              {asgn.status === 'In Progress' && <Clock3 className="w-5 h-5" />}
-              {asgn.status}
+              {status === 'Completed' && <CheckCircle2 className="w-5 h-5" />}
+              {status === 'In Progress' && <Clock3 className="w-5 h-5" />}
+              {status}
             </div>
           </div>
+              </>
+            );
+          })()}
         </div>
       ))}
     </div>
   );
 }
 
-function TeacherAssignmentsView({ onRefresh }: { onRefresh: () => void }) {
+function TeacherAssignmentsView({ assignments, onRefresh }: { assignments: any[]; onRefresh: () => void }) {
   const [title, setTitle] = useState('');
   const [subject, setSubject] = useState('Software Engineering');
   const [date, setDate] = useState('');
@@ -178,22 +185,22 @@ function TeacherAssignmentsView({ onRefresh }: { onRefresh: () => void }) {
           <h2 className="text-lg font-black text-slate-800 tracking-tight">Active Assignments</h2>
         </div>
 
-        {[1, 2, 3].map((_, i) => (
-          <div key={i} className="bg-white rounded-xl p-10 shadow-sm border border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-6 group hover:shadow-2xl hover:shadow-purple-900/5 transition-all">
+        {assignments.map((item, i) => (
+          <div key={item.id || i} className="bg-white rounded-xl p-10 shadow-sm border border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-6 group hover:shadow-2xl hover:shadow-purple-900/5 transition-all">
             <div className="flex items-center gap-8">
               <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center border-2 border-blue-100 shadow-sm">
                 <BookOpen className="w-8 h-8" />
               </div>
               <div>
-                <h4 className="text-sm font-black text-slate-800 tracking-tight mb-2">{i === 0 ? 'Agile Methodology Report' : i === 1 ? 'Process Scheduling Quiz' : 'Binary Search Tree Implementation'}</h4>
+                <h4 className="text-sm font-black text-slate-800 tracking-tight mb-2">{item.title}</h4>
                 <div className="flex flex-wrap items-center gap-6">
                   <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest flex items-center gap-2">
                     <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
-                    28/40 <span className="text-slate-400 font-bold">Submissions</span>
+                    {item.subject} <span className="text-slate-400 font-bold">Subject</span>
                   </span>
                   <span className="text-[10px] font-black text-rose-500 uppercase tracking-widest flex items-center gap-2">
                     <div className="w-1.5 h-1.5 bg-rose-500 rounded-full" />
-                    Due: April 25, 2026
+                    Due: {item.due_date}
                   </span>
                 </div>
               </div>

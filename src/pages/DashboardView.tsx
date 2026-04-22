@@ -7,17 +7,18 @@ export default function DashboardView({ user }: { user: any }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`/api/student-data/${user.id}`)
+    fetch(`/api/student-data/${user.id}?role=${user.role}`)
       .then(res => res.json())
       .then(d => {
         setData(d);
         setLoading(false);
       });
-  }, [user.id]);
+  }, [user.id, user.role]);
 
   if (loading) return null;
 
   const isStudent = user.role === 'student';
+  const todaySchedule = data.todaySchedule && data.todaySchedule.length > 0 ? data.todaySchedule : data.timetable;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -27,12 +28,12 @@ export default function DashboardView({ user }: { user: any }) {
           <div className="flex items-center justify-between mb-10">
             <h2 className="text-base font-black text-slate-800 tracking-tight">Today's Schedule</h2>
             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">
-              {isStudent ? '2ND YEAR CSE A, 105, PARK, 39' : 'SENIOR PROFESSOR - DEPT. OF CSE'}
+              {isStudent ? `${user.section || 'II B.Tech II Sem CSE - A'} • ${data.today || ''}` : `FACULTY VIEW • ${data.today || ''}`}
             </p>
           </div>
 
           <div className="space-y-6">
-            {data.timetable.slice(0, 3).map((item: any, idx: number) => (
+            {todaySchedule.slice(0, 6).map((item: any, idx: number) => (
               <div key={idx} className="flex items-center gap-6 group">
                 <div className={`w-12 h-12 rounded-lg flex items-center justify-center shadow-sm ${
                   idx === 0 ? 'bg-[#5c67f2] text-white' : 
@@ -43,13 +44,18 @@ export default function DashboardView({ user }: { user: any }) {
                 </div>
                 <div className="flex-1">
                   <h4 className="text-xs font-black text-slate-800 tracking-tight">{item.subject}</h4>
-                  <p className="text-[10px] font-bold text-slate-400 mt-0.5">{item.room || 'CSE Lab'}</p>
+                  <p className="text-[10px] font-bold text-slate-400 mt-0.5">
+                    {item.room || 'CSE Lab'} {!isStudent && item.student_id ? `• ${item.student_id}` : ''}
+                  </p>
                 </div>
                 <div className="text-right">
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{item.time || '10:30 - 11:30 AM'}</span>
                 </div>
               </div>
             ))}
+            {todaySchedule.length === 0 && (
+              <p className="text-xs font-bold text-slate-400">No classes scheduled for today.</p>
+            )}
           </div>
 
           {!isStudent && (
@@ -65,8 +71,8 @@ export default function DashboardView({ user }: { user: any }) {
       {isStudent && (
         <div className="lg:col-span-4 grid grid-cols-2 gap-6">
           <StatCard value="9.2" label="Current CGPA" color="text-blue-600" />
-          <StatCard value="98%" label="Attendance" color="text-[#a855f7]" />
-          <StatCard value="12" label="Pending Tasks" color="text-emerald-500" />
+          <StatCard value={`${data.stats?.attendancePct ?? 0}%`} label="Attendance" color="text-[#a855f7]" />
+          <StatCard value={`${data.assignments?.filter((a: any) => a.status !== 'Completed').length ?? 0}`} label="Pending Tasks" color="text-emerald-500" />
           <StatCard value="45" label="Total Credits" color="text-orange-500" />
           
           <div className="col-span-2 mt-4 text-right">

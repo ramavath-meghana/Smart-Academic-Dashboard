@@ -1,7 +1,21 @@
 import { User, Mail, Fingerprint, MapPin, Phone, ShieldCheck, GraduationCap } from 'lucide-react';
 import { motion } from 'motion/react';
+import { useEffect, useState } from 'react';
 
 export default function ProfileView({ user }: { user: any }) {
+  const [profileData, setProfileData] = useState<any>(null);
+
+  useEffect(() => {
+    fetch(`/api/student-data/${user.id}?role=${user.role}`)
+      .then((res) => res.json())
+      .then((d) => setProfileData(d))
+      .catch(() => setProfileData(null));
+  }, [user.id, user.role]);
+
+  const isStudent = user.role === 'student';
+  const attendance = `${profileData?.stats?.attendancePct ?? 0}%`;
+  const average = `${profileData?.stats?.avgMarks ?? 0}%`;
+
   return (
     <div className="max-w-5xl mx-auto space-y-10 pb-20">
       {/* Header Profile Section */}
@@ -22,7 +36,7 @@ export default function ProfileView({ user }: { user: any }) {
                 {user.role}
               </span>
               <span className="px-5 py-2 bg-emerald-50 text-emerald-600 rounded-lg text-xs font-black uppercase tracking-widest border border-emerald-100">
-                Active Student
+                {isStudent ? 'Active Student' : 'Faculty Member'}
               </span>
             </div>
           </div>
@@ -40,19 +54,21 @@ export default function ProfileView({ user }: { user: any }) {
             <h2 className="text-lg font-black text-slate-800 tracking-tight mb-10">Personal Details</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-              <InfoItem icon={Fingerprint} label="Student ID" value={user.id} />
-              <InfoItem icon={Mail} label="Academic Email" value={`${user.id.toLowerCase()}@university.edu`} />
-              <InfoItem icon={GraduationCap} label="Course / Branch" value="Computer Science & Engineering" />
-              <InfoItem icon={ShieldCheck} label="Current Semester" value="4th Semester (B.Tech)" />
+              <InfoItem icon={Fingerprint} label={isStudent ? 'Student ID' : 'Faculty ID'} value={user.id} />
+              <InfoItem icon={Mail} label="Academic Email" value={user.email || `${user.id.toLowerCase()}@university.edu`} />
+              <InfoItem icon={GraduationCap} label="Course / Branch" value={user.department || 'Computer Science & Engineering'} />
+              <InfoItem icon={ShieldCheck} label={isStudent ? 'Current Semester' : 'Designation'} value={isStudent ? 'II B.Tech II Semester' : 'Assistant Professor'} />
               <InfoItem icon={Phone} label="Contact Number" value="+91 9876543210" />
-              <InfoItem icon={MapPin} label="Local Address" value="Boys Hostel, Block C, Room 402" />
+              <InfoItem icon={MapPin} label="Local Address" value={isStudent ? 'Girls Hostel, Block A, Room 402' : 'CSE Department Office'} />
             </div>
           </div>
 
           <div className="bg-white rounded-xl p-12 shadow-sm border border-slate-100">
             <h2 className="text-lg font-black text-slate-800 tracking-tight mb-8">Bio / Summary</h2>
             <p className="text-sm font-bold text-slate-400 leading-relaxed italic">
-              "Enthusiastic computer science student with a passion for web technologies and database management. Currently maintaining a high CGPA and actively participating in department events."
+              {isStudent
+                ? '"Enthusiastic computer science student with a passion for web technologies and database management."'
+                : '"Faculty mentor focused on student outcomes, project mentoring, and applied learning."'}
             </p>
           </div>
         </div>
@@ -62,9 +78,9 @@ export default function ProfileView({ user }: { user: any }) {
           <div className="bg-gradient-to-br from-indigo-600 to-blue-700 rounded-xl p-10 text-white shadow-2xl shadow-blue-900/20">
             <h3 className="text-base font-black mb-8 tracking-tight">Academic Progress</h3>
             <div className="space-y-8">
-              <ProgressItem label="Attendance" value="98%" />
-              <ProgressItem label="Average Marks" value="85%" />
-              <ProgressItem label="Course Completion" value="45%" />
+              <ProgressItem label="Attendance" value={attendance} />
+              <ProgressItem label="Average Marks" value={average} />
+              <ProgressItem label="Course Completion" value={isStudent ? '45%' : '78%'} />
             </div>
           </div>
 
