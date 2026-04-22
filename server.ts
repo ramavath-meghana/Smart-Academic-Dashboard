@@ -4,29 +4,26 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { createServer as createViteServer } from "vite";
 import mysql from "mysql2";
+import dotenv from "dotenv";
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+
 app.use(cors());
 app.use(express.json());
 
 // ---------------- MYSQL CONNECTION ----------------
+const db = mysql.createPool(process.env.MYSQL_URL as string);
 
-if (!process.env.MYSQL_PUBLIC_URL) {
-  throw new Error("MYSQL_PUBLIC_URL is missing in environment variables");
-}
-
-const db = mysql.createPool(process.env.MYSQL_PUBLIC_URL);
-
-// test connection
-db.getConnection((err, connection) => {
+// test DB connection (safe for pool)
+db.query("SELECT 1", (err) => {
   if (err) {
     console.log("❌ MySQL connection failed:", err);
   } else {
     console.log("✅ MySQL connected");
-    connection.release();
   }
 });
 
@@ -188,22 +185,11 @@ app.post("/api/marks", (req, res) => {
 });
 
 // ---------------- VITE ----------------
-if (process.env.NODE_ENV !== "production") {
-  const vite = await createViteServer({
-    server: { middlewareMode: true },
-    appType: "spa",
-  });
 
-  app.use(vite.middlewares);
-} else {
-  app.use(express.static(path.join(__dirname, "dist")));
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "dist", "index.html"));
-  });
-}
 
 // ---------------- START ----------------
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
+
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
 });

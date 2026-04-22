@@ -15,8 +15,7 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
     setError('');
 
     try {
-      const res = await fetch('https://smart-academic-dashboard-production.up.railway.app/api/login', {
-        method: 'POST',
+      const res = await fetch('http://localhost:3000/api/login', {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, password, role }),
       });
