@@ -15,7 +15,8 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
     setError('');
 
     try {
-      const res = await fetch('http://localhost:3000/api/login', {
+      const apiUrl = `http://${window.location.hostname}:3000/api/login`;
+      const res = await fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, password, role }),
