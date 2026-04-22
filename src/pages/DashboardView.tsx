@@ -60,8 +60,8 @@ export default function DashboardView({ user }: { user: any }) {
 
           {!isStudent && (
              <div className="mt-12 text-right">
-                <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">Activate Windows</p>
-                <p className="text-[8px] font-bold text-slate-300 uppercase mt-1">Go to Settings to activate Windows.</p>
+                <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]"></p>
+                <p className="text-[8px] font-bold text-slate-300 uppercase mt-1"></p>
              </div>
           )}
         </div>
