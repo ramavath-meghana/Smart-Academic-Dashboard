@@ -40,7 +40,7 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
           <GraduationCap className="w-8 h-8 text-white" />
         </div>
         <h1 className="text-2xl font-black text-slate-800 tracking-tight mb-1">Smart Academic Dashboard</h1>
-        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none"></p>
+        
       </div>
 
       <motion.div 
