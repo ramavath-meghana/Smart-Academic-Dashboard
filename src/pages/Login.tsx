@@ -15,10 +15,12 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
     setError('');
 
     try {
+      const trimmedId = id.trim();
+      const trimmedPassword = password.trim();
       const res = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, password, role }),
+        body: JSON.stringify({ id: trimmedId, password: trimmedPassword, role }),
       });
       const data = await res.json();
 

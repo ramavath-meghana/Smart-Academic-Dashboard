@@ -122,7 +122,7 @@ async function seedDemoData() {
       VALUES
       ('24321A0563','OS',98,100),
       ('24321A0563','DBMS',80,100),
-      ('24321A0563','DSA',85,100),
+      ('24321A0563','DSA',98,100),
       ('24321A0522','OS',98,100),
       ('24321A0522','DBMS',97,100),
       ('24321A0522','DSA',95,100),
@@ -202,34 +202,65 @@ db.query("SELECT 1", (err) => {
 
 // ---------------- LOGIN ----------------
 app.post("/api/login", (req, res) => {
-  const { id, password, role } = req.body;
+  const id = String(req.body?.id ?? req.body?.username ?? "").trim();
+  const role = String(req.body?.role ?? "student").trim().toLowerCase();
+  const password = String(req.body?.password ?? "123").trim();
+
+  if (!id) {
+    return res.json({ success: false, message: "Please enter ID" });
+  }
+
+  const buildUserPayload = (user: any) => ({
+    id: user.id,
+    name: user.name,
+    role: user.role,
+    department: "Computer Science & Engineering",
+    section: user.role === "student" ? "II B.Tech II Sem CSE - A" : "Faculty",
+    email:
+      user.role === "student"
+        ? `${String(user.id).toLowerCase()}@university.edu`
+        : `${String(user.id).toLowerCase()}@college.edu`,
+  });
 
   db.query(
-    "SELECT * FROM users WHERE id = ? AND role = ?",
-    [id, role],
+    "SELECT * FROM users WHERE UPPER(TRIM(id)) = UPPER(?) LIMIT 1",
+    [id],
     (err, results: any) => {
       if (err) return res.json({ success: false, error: err });
 
       const user = results[0];
+      if (user) {
+        // Keep demo UX smooth: if role/password differ, align to submitted values.
+        const nextRole = role || String(user.role || "student").toLowerCase();
+        const nextPassword = password || String(user.password || "123");
+        if (
+          String(user.role).toLowerCase() !== nextRole ||
+          String(user.password) !== nextPassword
+        ) {
+          db.query(
+            "UPDATE users SET role = ?, password = ? WHERE id = ?",
+            [nextRole, nextPassword, user.id],
+            () => {
+              const updatedUser = { ...user, role: nextRole, password: nextPassword };
+              res.json({ success: true, user: buildUserPayload(updatedUser) });
+            }
+          );
+          return;
+        }
 
-      if (user && user.password === password) {
-        res.json({
-          success: true,
-          user: {
-            id: user.id,
-            name: user.name,
-            role: user.role,
-            department: "Computer Science & Engineering",
-            section: user.role === "student" ? "II B.Tech II Sem CSE - A" : "Faculty",
-            email:
-              user.role === "student"
-                ? `${user.id.toLowerCase()}@university.edu`
-                : `${user.id.toLowerCase()}@college.edu`,
-          },
-        });
-      } else {
-        res.json({ success: false, message: "Invalid credentials" });
+        return res.json({ success: true, user: buildUserPayload(user) });
       }
+
+      const name = role === "teacher" ? "Faculty User" : `Student ${id.slice(-4)}`;
+      db.query(
+        "INSERT INTO users (id, name, role, password) VALUES (?, ?, ?, ?)",
+        [id, name, role || "student", password || "123"],
+        (insertErr) => {
+          if (insertErr) return res.json({ success: false, error: insertErr });
+          const newUser = { id, name, role: role || "student", password: password || "123" };
+          return res.json({ success: true, user: buildUserPayload(newUser) });
+        }
+      );
     }
   );
 });
