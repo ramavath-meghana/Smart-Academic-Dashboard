@@ -15,19 +15,19 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
     setError('');
 
     try {
-      const apiUrl = `http://${window.location.hostname}:3000/api/login`;
-      const res = await fetch(apiUrl, {
+      const res = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, password, role }),
       });
       const data = await res.json();
+
       if (data.success) {
         onLogin(data.user);
       } else {
-        setError(data.message);
+        setError(data.message || 'Invalid credentials');
       }
-    } catch (err) {
+    } catch {
       setError('Connection failed. Please try again.');
     } finally {
       setIsLoading(false);
