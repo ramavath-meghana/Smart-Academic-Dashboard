@@ -21,6 +21,83 @@ const dbPromise = db.promise();
 const getTodayName = () =>
   new Date().toLocaleDateString("en-US", { weekday: "long" });
 
+async function ensureSchema() {
+  await dbPromise.query(`
+    CREATE TABLE IF NOT EXISTS users (
+      id VARCHAR(50) PRIMARY KEY,
+      name VARCHAR(255) NOT NULL,
+      role VARCHAR(20) NOT NULL,
+      password VARCHAR(255) NOT NULL
+    )
+  `);
+
+  await dbPromise.query(`
+    CREATE TABLE IF NOT EXISTS marks (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      student_id VARCHAR(50) NOT NULL,
+      subject VARCHAR(100) NOT NULL,
+      score INT NOT NULL,
+      total INT NOT NULL
+    )
+  `);
+
+  await dbPromise.query(`
+    CREATE TABLE IF NOT EXISTS attendance (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      student_id VARCHAR(50) NOT NULL,
+      subject VARCHAR(100) NOT NULL,
+      date DATE NOT NULL,
+      status VARCHAR(20) NOT NULL
+    )
+  `);
+
+  await dbPromise.query(`
+    CREATE TABLE IF NOT EXISTS timetable (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      day VARCHAR(20) NOT NULL,
+      student_id VARCHAR(50) NOT NULL,
+      subject VARCHAR(100) NOT NULL,
+      time VARCHAR(50) NOT NULL,
+      room VARCHAR(100) NOT NULL
+    )
+  `);
+
+  await dbPromise.query(`
+    CREATE TABLE IF NOT EXISTS complaints (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      user_id VARCHAR(50) NOT NULL,
+      title VARCHAR(255) NOT NULL,
+      description TEXT NOT NULL,
+      type VARCHAR(20) NOT NULL,
+      date DATE NOT NULL,
+      status VARCHAR(20) DEFAULT 'Open'
+    )
+  `);
+
+  await dbPromise.query(`
+    CREATE TABLE IF NOT EXISTS assignments (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      title VARCHAR(255) NOT NULL,
+      subject VARCHAR(100) NOT NULL,
+      due_date DATE NOT NULL,
+      description TEXT,
+      status VARCHAR(30) DEFAULT 'Pending'
+    )
+  `);
+
+  await dbPromise.query(`
+    CREATE TABLE IF NOT EXISTS feedback (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      student_id VARCHAR(50) NOT NULL,
+      subject VARCHAR(100) NOT NULL,
+      time VARCHAR(50) NOT NULL,
+      type VARCHAR(30) NOT NULL,
+      comment TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+}
+
 async function seedDemoData() {
   try {
     const [existingUsers] = await dbPromise.query(
@@ -117,7 +194,9 @@ db.query("SELECT 1", (err) => {
     console.log("❌ MySQL connection failed:", err);
   } else {
     console.log("✅ MySQL connected");
-    void seedDemoData();
+    void ensureSchema().then(seedDemoData).catch((schemaErr) => {
+      console.log("❌ Schema setup failed:", schemaErr);
+    });
   }
 });
 
