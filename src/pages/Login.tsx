@@ -39,8 +39,8 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
         <div className="w-14 h-14 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-2xl shadow-blue-200 mx-auto mb-4 transform transition-hover hover:rotate-6">
           <GraduationCap className="w-8 h-8 text-white" />
         </div>
-        <h1 className="text-2xl font-black text-slate-800 tracking-tight mb-1">Smart Academic</h1>
-        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Management System v2.0</p>
+        <h1 className="text-2xl font-black text-slate-800 tracking-tight mb-1">Smart Academic Dashboard</h1>
+        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none"></p>
       </div>
 
       <motion.div 
