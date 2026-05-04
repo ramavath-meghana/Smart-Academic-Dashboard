@@ -22,7 +22,12 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: trimmedId, password: trimmedPassword, role }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => null);
+
+      if (!res.ok || !data) {
+        setError('Login service unavailable. Please try again shortly.');
+        return;
+      }
 
       if (data.success) {
         onLogin(data.user);
