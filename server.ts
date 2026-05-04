@@ -16,8 +16,9 @@ app.use(cors());
 app.use(express.json());
 
 // ---------------- MYSQL CONNECTION ----------------
-const db = process.env.MYSQL_URL
-  ? mysql.createPool(process.env.MYSQL_URL)
+const mysqlUrl = process.env.MYSQL_URL || process.env.MYSQL_PUBLIC_URL;
+const db = mysqlUrl
+  ? mysql.createPool(mysqlUrl)
   : mysql.createPool({
       host: process.env.DB_HOST || "localhost",
       user: process.env.DB_USER || "root",
