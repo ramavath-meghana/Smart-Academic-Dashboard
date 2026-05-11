@@ -22,17 +22,34 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: trimmedId, password: trimmedPassword, role }),
       });
-      const raw = await res.text();
-      const data = raw ? JSON.parse(raw) : null;
+      const contentType = res.headers.get('content-type') || '';
+      let data: any = null;
+      let raw = '';
+
+      if (contentType.includes('application/json')) {
+        data = await res.json().catch(() => null);
+      } else {
+        raw = await res.text().catch(() => '');
+        if (raw) {
+          try {
+            data = JSON.parse(raw);
+          } catch {
+            data = null;
+          }
+        }
+      }
 
       if (!res.ok) {
-        const statusMessage = data?.message || `Login failed with status ${res.status}`;
+        const statusMessage =
+          data?.message ||
+          raw ||
+          `Login failed with status ${res.status}. Please check backend logs.`;
         setError(statusMessage);
         return;
       }
 
       if (!data) {
-        setError('Login response was empty. Please try again.');
+        setError('Login response was empty or unreadable. Please try again.');
         return;
       }
 
@@ -41,8 +58,9 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
       } else {
         setError(data.message || 'Invalid credentials');
       }
-    } catch {
-      setError('Connection failed or invalid server response. Please try again.');
+    } catch (err: any) {
+      const message = String(err?.message || '').trim();
+      setError(message ? `Invalid server response: ${message}` : 'Connection failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
