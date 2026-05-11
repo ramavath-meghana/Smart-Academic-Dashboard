@@ -58,7 +58,7 @@ export default function ProfileView({ user }: { user: any }) {
               <InfoItem icon={Mail} label="Academic Email" value={user.email || `${user.id.toLowerCase()}@university.edu`} />
               <InfoItem icon={GraduationCap} label="Course / Branch" value={user.department || 'Computer Science & Engineering'} />
               <InfoItem icon={ShieldCheck} label={isStudent ? 'Current Semester' : 'Designation'} value={isStudent ? 'II B.Tech II Semester' : 'Assistant Professor'} />
-              <InfoItem icon={Phone} label="Contact Number" value="+91 9876543210" />
+              <InfoItem icon={Phone} label="Contact Number" value="+91 7382616050" />
               <InfoItem icon={MapPin} label="Local Address" value={isStudent ? 'Girls Hostel, Block A, Room 402' : 'CSE Department Office'} />
             </div>
           </div>
@@ -87,9 +87,11 @@ export default function ProfileView({ user }: { user: any }) {
           <div className="bg-slate-900 rounded-xl p-10 text-white shadow-2xl shadow-slate-900/20">
             <h3 className="text-base font-black mb-6 tracking-tight">Guardian Contact</h3>
             <p className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-1">Name</p>
-            <p className="text-sm font-bold mb-6">Mr. Ramesh Varma</p>
+            <p className="text-sm font-bold mb-6">Mr. R . Pandu</p>
             <p className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-1">Relationship</p>
             <p className="text-sm font-bold">Father</p>
+            <p className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-1">Contact Number</p>
+            <p className="text-sm font-bold">+91 9676746050</p>
           </div>
         </div>
       </div>
