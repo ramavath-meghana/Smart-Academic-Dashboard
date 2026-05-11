@@ -17,19 +17,33 @@ app.use(cors());
 app.use(express.json());
 
 // ---------------- MYSQL CONNECTION ----------------
-const mysqlUrl = process.env.MYSQL_URL || process.env.MYSQL_PUBLIC_URL;
-const db = mysqlUrl
-  ? mysql.createPool(mysqlUrl)
-  : mysql.createPool({
-      host: process.env.DB_HOST || "localhost",
-      user: process.env.DB_USER || "root",
-      password: process.env.DB_PASSWORD || "",
-      database: process.env.DB_NAME || "smart_academic_v2",
-      port: Number(process.env.DB_PORT || 3306),
-      waitForConnections: true,
-      connectionLimit: 10,
-      queueLimit: 0,
-    });
+const mysqlUrl = String(process.env.MYSQL_URL || process.env.MYSQL_PUBLIC_URL || "").trim();
+const fallbackDbConfig = {
+  host: process.env.DB_HOST || "localhost",
+  user: process.env.DB_USER || "root",
+  password: process.env.DB_PASSWORD || "",
+  database: process.env.DB_NAME || "smart_academic_v2",
+  port: Number(process.env.DB_PORT || 3306),
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+};
+
+let db: mysql.Pool;
+if (mysqlUrl) {
+  try {
+    const parsed = new URL(mysqlUrl);
+    if (!["mysql:", "mysql2:"].includes(parsed.protocol)) {
+      throw new Error(`Unsupported MYSQL_URL protocol: ${parsed.protocol}`);
+    }
+    db = mysql.createPool(mysqlUrl);
+  } catch (urlError) {
+    console.log("⚠️ Invalid MYSQL_URL detected, using DB_* fallback config:", urlError);
+    db = mysql.createPool(fallbackDbConfig);
+  }
+} else {
+  db = mysql.createPool(fallbackDbConfig);
+}
 const dbPromise = db.promise();
 const getTodayName = () =>
   new Date().toLocaleDateString("en-US", { weekday: "long" });
