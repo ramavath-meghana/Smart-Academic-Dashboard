@@ -22,10 +22,17 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: trimmedId, password: trimmedPassword, role }),
       });
-      const data = await res.json().catch(() => null);
+      const raw = await res.text();
+      const data = raw ? JSON.parse(raw) : null;
 
-      if (!res.ok || !data) {
-        setError('Login service unavailable. Please try again shortly.');
+      if (!res.ok) {
+        const statusMessage = data?.message || `Login failed with status ${res.status}`;
+        setError(statusMessage);
+        return;
+      }
+
+      if (!data) {
+        setError('Login response was empty. Please try again.');
         return;
       }
 
@@ -35,7 +42,7 @@ export default function Login({ onLogin }: { onLogin: (user: any) => void }) {
         setError(data.message || 'Invalid credentials');
       }
     } catch {
-      setError('Connection failed. Please try again.');
+      setError('Connection failed or invalid server response. Please try again.');
     } finally {
       setIsLoading(false);
     }

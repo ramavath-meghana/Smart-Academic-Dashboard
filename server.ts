@@ -2,13 +2,14 @@ import express from "express";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
-import { createServer as createViteServer } from "vite";
 import mysql from "mysql2";
 import dotenv from "dotenv";
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const isProduction = process.env.NODE_ENV === "production";
+const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+const shouldAutoSeed = process.env.AUTO_SEED === "true" || (!isProduction && !isServerless);
 
 const app = express();
 
@@ -32,6 +33,8 @@ const db = mysqlUrl
 const dbPromise = db.promise();
 const getTodayName = () =>
   new Date().toLocaleDateString("en-US", { weekday: "long" });
+const getErrorMessage = (error: unknown, fallback: string) =>
+  error instanceof Error ? error.message : fallback;
 
 async function ensureSchema() {
   await dbPromise.query(`
@@ -200,17 +203,14 @@ async function seedDemoData() {
   }
 }
 
-// test DB connection (safe for pool)
-db.query("SELECT 1", (err) => {
-  if (err) {
-    console.log("❌ MySQL connection failed:", err);
-  } else {
-    console.log("✅ MySQL connected");
-    void ensureSchema().then(seedDemoData).catch((schemaErr) => {
+if (shouldAutoSeed) {
+  // Avoid expensive boot-time schema mutations in serverless production.
+  void ensureSchema()
+    .then(seedDemoData)
+    .catch((schemaErr) => {
       console.log("❌ Schema setup failed:", schemaErr);
     });
-  }
-});
+}
 
 // ---------------- LOGIN ----------------
 app.post("/api/login", (req, res) => {
@@ -238,7 +238,14 @@ app.post("/api/login", (req, res) => {
     "SELECT * FROM users WHERE UPPER(TRIM(id)) = UPPER(?) LIMIT 1",
     [id],
     (err, results: any) => {
-      if (err) return res.json({ success: false, error: err });
+      if (err) {
+        console.log("❌ Login query failed:", err);
+        return res.status(503).json({
+          success: false,
+          message: "Database temporarily unavailable. Please try again shortly.",
+          details: getErrorMessage(err, "Login query failed"),
+        });
+      }
 
       const user = results[0];
       if (user) {
@@ -252,9 +259,17 @@ app.post("/api/login", (req, res) => {
           db.query(
             "UPDATE users SET role = ?, password = ? WHERE id = ?",
             [nextRole, nextPassword, user.id],
-            () => {
+            (updateErr) => {
+              if (updateErr) {
+                console.log("❌ Login update failed:", updateErr);
+                return res.status(500).json({
+                  success: false,
+                  message: "Could not complete login update.",
+                  details: getErrorMessage(updateErr, "Update failed"),
+                });
+              }
               const updatedUser = { ...user, role: nextRole, password: nextPassword };
-              res.json({ success: true, user: buildUserPayload(updatedUser) });
+              return res.json({ success: true, user: buildUserPayload(updatedUser) });
             }
           );
           return;
@@ -268,7 +283,14 @@ app.post("/api/login", (req, res) => {
         "INSERT INTO users (id, name, role, password) VALUES (?, ?, ?, ?)",
         [id, name, role || "student", password || "123"],
         (insertErr) => {
-          if (insertErr) return res.json({ success: false, error: insertErr });
+          if (insertErr) {
+            console.log("❌ Login auto-create failed:", insertErr);
+            return res.status(500).json({
+              success: false,
+              message: "Could not create user at this time.",
+              details: getErrorMessage(insertErr, "Insert failed"),
+            });
+          }
           const newUser = { id, name, role: role || "student", password: password || "123" };
           return res.json({ success: true, user: buildUserPayload(newUser) });
         }
@@ -286,9 +308,11 @@ app.post("/api/register-student", (req, res) => {
     [id, name, password],
     (err) => {
       if (err) {
+        console.log("❌ Register student failed:", err);
         return res.status(400).json({
           success: false,
-          message: "Student ID already exists",
+          message: "Student registration failed",
+          details: getErrorMessage(err, "Student ID may already exist"),
         });
       }
       res.json({ success: true });
@@ -301,6 +325,10 @@ app.get("/api/students", (req, res) => {
   db.query(
     "SELECT id, name FROM users WHERE role = 'student'",
     (err, results) => {
+      if (err) {
+        console.log("❌ Students fetch failed:", err);
+        return res.status(500).json({ success: false, message: "Failed to fetch students" });
+      }
       res.json(results);
     }
   );
@@ -387,7 +415,11 @@ app.post("/api/feedback", (req, res) => {
   db.query(
     "INSERT INTO feedback (student_id, subject, time, type, comment) VALUES (?, ?, ?, ?, ?)",
     [studentId, subject, time, type, comment],
-    () => {
+    (err) => {
+      if (err) {
+        console.log("❌ Feedback insert failed:", err);
+        return res.status(500).json({ success: false, message: "Failed to save feedback" });
+      }
       res.json({ success: true });
     }
   );
@@ -398,6 +430,10 @@ app.get("/api/teacher/feedback", (req, res) => {
   db.query(
     "SELECT * FROM feedback ORDER BY created_at DESC",
     (err, results) => {
+      if (err) {
+        console.log("❌ Teacher feedback fetch failed:", err);
+        return res.status(500).json({ success: false, message: "Failed to fetch feedback" });
+      }
       res.json(results);
     }
   );
@@ -410,7 +446,11 @@ app.post("/api/assignments", (req, res) => {
   db.query(
     "INSERT INTO assignments (title, subject, due_date, description) VALUES (?, ?, ?, ?)",
     [title, subject, due_date, description],
-    () => {
+    (err) => {
+      if (err) {
+        console.log("❌ Assignment insert failed:", err);
+        return res.status(500).json({ success: false, message: "Failed to create assignment" });
+      }
       res.json({ success: true });
     }
   );
@@ -430,7 +470,11 @@ app.post("/api/complaints", (req, res) => {
   db.query(
     "INSERT INTO complaints (user_id, title, description, type, date) VALUES (?, ?, ?, ?, ?)",
     [userId, title, description, type, date],
-    () => {
+    (err) => {
+      if (err) {
+        console.log("❌ Complaint insert failed:", err);
+        return res.status(500).json({ success: false, message: "Failed to submit complaint" });
+      }
       res.json({ success: true });
     }
   );
@@ -440,6 +484,10 @@ app.get("/api/complaints", (req, res) => {
   db.query(
     "SELECT * FROM complaints ORDER BY id DESC",
     (err, results) => {
+      if (err) {
+        console.log("❌ Complaints fetch failed:", err);
+        return res.status(500).json({ success: false, message: "Failed to fetch complaints" });
+      }
       res.json(results);
     }
   );
@@ -452,7 +500,11 @@ app.post("/api/attendance", (req, res) => {
   db.query(
     "INSERT INTO attendance (student_id, subject, date, status) VALUES (?, ?, ?, ?)",
     [studentId, subject, date, status],
-    () => {
+    (err) => {
+      if (err) {
+        console.log("❌ Attendance insert failed:", err);
+        return res.status(500).json({ success: false, message: "Failed to save attendance" });
+      }
       res.json({ success: true });
     }
   );
@@ -465,10 +517,29 @@ app.post("/api/marks", (req, res) => {
   db.query(
     "INSERT INTO marks (student_id, subject, score, total) VALUES (?, ?, ?, ?)",
     [studentId, subject, score, total],
-    () => {
+    (err) => {
+      if (err) {
+        console.log("❌ Marks insert failed:", err);
+        return res.status(500).json({ success: false, message: "Failed to save marks" });
+      }
       res.json({ success: true });
     }
   );
+});
+
+app.get("/api/health", (_req, res) => {
+  db.query("SELECT 1", (err) => {
+    if (err) {
+      console.log("❌ Health check failed:", err);
+      return res.status(503).json({
+        success: false,
+        status: "degraded",
+        message: "Database unreachable",
+        details: getErrorMessage(err, "DB ping failed"),
+      });
+    }
+    return res.json({ success: true, status: "ok" });
+  });
 });
 
 // ---------------- VITE ----------------
