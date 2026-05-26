@@ -5,20 +5,49 @@ import { motion } from 'motion/react';
 export default function DashboardView({ user }: { user: any }) {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
+    setLoading(true);
+    setError('');
     fetch(`/api/student-data/${user.id}?role=${user.role}`)
-      .then(res => res.json())
-      .then(d => {
-        setData(d);
-        setLoading(false);
-      });
+      .then((res) => res.json().then((body) => ({ ok: res.ok, body })))
+      .then(({ ok, body }) => {
+        if (!ok || body?.success === false) {
+          setData(null);
+          setError(body?.message || 'Could not load dashboard data. Is the backend and database running?');
+          return;
+        }
+        setData(body);
+      })
+      .catch(() => {
+        setData(null);
+        setError('Could not reach the server. Run npm run dev and ensure MySQL is connected.');
+      })
+      .finally(() => setLoading(false));
   }, [user.id, user.role]);
 
-  if (loading) return null;
+  if (loading) {
+    return (
+      <div className="bg-white rounded-xl p-10 shadow-sm border border-slate-50 text-center">
+        <p className="text-sm font-bold text-slate-400">Loading dashboard...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-white rounded-xl p-10 shadow-sm border border-rose-100 text-center">
+        <p className="text-sm font-black text-rose-600 mb-2">Dashboard unavailable</p>
+        <p className="text-xs font-bold text-slate-500">{error}</p>
+      </div>
+    );
+  }
 
   const isStudent = user.role === 'student';
-  const todaySchedule = data.todaySchedule && data.todaySchedule.length > 0 ? data.todaySchedule : data.timetable;
+  const scheduleSource =
+    data?.todaySchedule?.length > 0 ? data.todaySchedule : data?.timetable;
+  const todaySchedule = Array.isArray(scheduleSource) ? scheduleSource : [];
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -72,7 +101,7 @@ export default function DashboardView({ user }: { user: any }) {
         <div className="lg:col-span-4 grid grid-cols-2 gap-6">
           <StatCard value="9.2" label="Current CGPA" color="text-blue-600" />
           <StatCard value={`${data.stats?.attendancePct ?? 0}%`} label="Attendance" color="text-[#a855f7]" />
-          <StatCard value={`${data.assignments?.filter((a: any) => a.status !== 'Completed').length ?? 0}`} label="Pending Tasks" color="text-emerald-500" />
+          <StatCard value={`${(data?.assignments ?? []).filter((a: any) => a.status !== 'Completed').length}`} label="Pending Tasks" color="text-emerald-500" />
           <StatCard value="45" label="Total Credits" color="text-orange-500" />
           
           <div className="col-span-2 mt-4 text-right">

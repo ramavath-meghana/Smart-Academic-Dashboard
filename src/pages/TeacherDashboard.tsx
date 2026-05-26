@@ -1,12 +1,11 @@
 import { useState, useEffect, FormEvent } from 'react';
 import { Users, CheckCircle, Award, Plus, Loader2, Search } from 'lucide-react';
-import Navbar from '../components/Navbar';
 import Card from '../components/Card';
-import { motion } from 'motion/react';
 
 export default function TeacherDashboard({ user }: { user: any }) {
   const [students, setStudents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [activeAction, setActiveAction] = useState<'attendance' | 'marks' | 'register'>('attendance');
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState('');
@@ -23,12 +22,20 @@ export default function TeacherDashboard({ user }: { user: any }) {
   }, []);
 
   const fetchStudents = () => {
+    setLoading(true);
+    setError('');
     fetch('/api/students')
-      .then(res => res.json())
-      .then(d => {
-        setStudents(d);
-        setLoading(false);
-      });
+      .then((res) => res.json().then((body) => ({ ok: res.ok, body })))
+      .then(({ ok, body }) => {
+        if (!ok || body?.success === false) {
+          setStudents([]);
+          setError(body?.message || 'Could not load students.');
+          return;
+        }
+        setStudents(Array.isArray(body) ? body : []);
+      })
+      .catch(() => setError('Could not reach the server.'))
+      .finally(() => setLoading(false));
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -77,13 +84,21 @@ export default function TeacherDashboard({ user }: { user: any }) {
     }
   };
 
-  if (loading) return <div className="p-8">Loading students...</div>;
+  if (loading) {
+    return (
+      <div className="bg-white rounded-xl p-10 shadow-sm border border-slate-50 text-center">
+        <p className="text-sm font-bold text-slate-400">Loading dashboard...</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex-1 bg-[#f0f2ff] overflow-y-auto min-h-screen">
-      <Navbar title="Teacher Dashboard" userName={user.name} />
-      
-      <div className="p-8 max-w-7xl mx-auto space-y-8">
+    <div className="space-y-8">
+        {error && (
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-rose-100 text-center">
+            <p className="text-xs font-bold text-rose-600">{error}</p>
+          </div>
+        )}
         {/* Welcome Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
@@ -250,7 +265,6 @@ export default function TeacherDashboard({ user }: { user: any }) {
             </div>
           </Card>
         </div>
-      </div>
     </div>
   );
 }

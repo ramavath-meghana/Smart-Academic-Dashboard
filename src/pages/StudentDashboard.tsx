@@ -1,29 +1,53 @@
 import { useState, useEffect } from 'react';
-import { BookOpen, Calendar, CheckCircle, Clock, Award, User } from 'lucide-react';
-import Navbar from '../components/Navbar';
+import { Calendar, Clock, Award, User } from 'lucide-react';
 import Card from '../components/Card';
 import { motion } from 'motion/react';
 
 export default function StudentDashboard({ user }: { user: any }) {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    fetch(`/api/student-data/${user.id}`)
-      .then(res => res.json())
-      .then(d => {
-        setData(d);
-        setLoading(false);
-      });
+    setLoading(true);
+    setError('');
+    fetch(`/api/student-data/${user.id}?role=student`)
+      .then((res) => res.json().then((body) => ({ ok: res.ok, body })))
+      .then(({ ok, body }) => {
+        if (!ok || body?.success === false) {
+          setData(null);
+          setError(body?.message || 'Could not load dashboard data.');
+          return;
+        }
+        setData(body);
+      })
+      .catch(() => setError('Could not reach the server.'))
+      .finally(() => setLoading(false));
   }, [user.id]);
 
-  if (loading) return <div className="p-8">Loading dashboard...</div>;
+  if (loading) {
+    return (
+      <div className="bg-white rounded-xl p-10 shadow-sm border border-slate-50 text-center">
+        <p className="text-sm font-bold text-slate-400">Loading dashboard...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-white rounded-xl p-10 shadow-sm border border-rose-100 text-center">
+        <p className="text-sm font-black text-rose-600 mb-2">Dashboard unavailable</p>
+        <p className="text-xs font-bold text-slate-500">{error}</p>
+      </div>
+    );
+  }
+
+  const timetable = Array.isArray(data?.timetable) ? data.timetable : [];
+  const marks = Array.isArray(data?.marks) ? data.marks : [];
+  const attendancePct = data?.stats?.attendancePct ?? 0;
 
   return (
-    <div className="flex-1 bg-[#f0f2ff] overflow-y-auto min-h-screen">
-      <Navbar title="Student Dashboard" userName={user.name} />
-      
-      <div className="p-8 max-w-7xl mx-auto space-y-8">
+    <div className="space-y-8">
         {/* Welcome Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
@@ -36,7 +60,7 @@ export default function StudentDashboard({ user }: { user: any }) {
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">CGPA</span>
             </div>
             <div className="bg-white px-6 py-3 rounded-xl shadow-sm border border-slate-100 flex flex-col items-center">
-              <span className="text-2xl font-black text-purple-600">94%</span>
+              <span className="text-2xl font-black text-purple-600">{attendancePct}%</span>
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Attendance</span>
             </div>
           </div>
@@ -46,8 +70,11 @@ export default function StudentDashboard({ user }: { user: any }) {
           {/* Timetable */}
           <Card title="Today's Timetable" icon={<Calendar className="w-5 h-5" />} className="lg:col-span-2">
             <div className="space-y-4">
-              {data.timetable.map((item: any) => (
-                <div key={item.id} className="flex items-center gap-4 p-4 bg-slate-50 rounded-xl border border-slate-100 transition-hover hover:bg-white hover:shadow-md">
+              {timetable.length === 0 && (
+                <p className="text-xs font-bold text-slate-400">No classes scheduled.</p>
+              )}
+              {timetable.map((item: any, idx: number) => (
+                <div key={item.id ?? idx} className="flex items-center gap-4 p-4 bg-slate-50 rounded-xl border border-slate-100 transition-hover hover:bg-white hover:shadow-md">
                   <div className="bg-blue-500 p-3 rounded-xl text-white">
                     <Clock className="w-5 h-5" />
                   </div>
@@ -67,8 +94,11 @@ export default function StudentDashboard({ user }: { user: any }) {
           {/* Results/Marks */}
           <Card title="Latest Results" icon={<Award className="w-5 h-5" />}>
             <div className="space-y-6">
-              {data.marks.map((mark: any) => (
-                <div key={mark.id} className="space-y-2">
+              {marks.length === 0 && (
+                <p className="text-xs font-bold text-slate-400">No results yet.</p>
+              )}
+              {marks.map((mark: any, idx: number) => (
+                <div key={mark.id ?? idx} className="space-y-2">
                   <div className="flex justify-between text-sm font-bold">
                     <span className="text-slate-700">{mark.subject}</span>
                     <span className="text-blue-600">{mark.score}/{mark.total}</span>
@@ -110,7 +140,6 @@ export default function StudentDashboard({ user }: { user: any }) {
             </div>
           </div>
         </Card>
-      </div>
     </div>
   );
 }

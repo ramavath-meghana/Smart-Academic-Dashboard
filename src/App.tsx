@@ -14,7 +14,8 @@ import {
 
 // Pages
 import Login from './pages/Login';
-import DashboardView from './pages/DashboardView';
+import StudentDashboard from './pages/StudentDashboard';
+import TeacherDashboard from './pages/TeacherDashboard';
 import FeedbackView from './pages/FeedbackView';
 import AssignmentsView from './pages/AssignmentsView';
 import ComplaintsView from './pages/ComplaintsView';
@@ -170,7 +171,11 @@ export default function App() {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
             >
-              {activeView === 'dashboard' && <DashboardView user={user} />}
+              {activeView === 'dashboard' && (
+                user.role === 'teacher'
+                  ? <TeacherDashboard user={user} />
+                  : <StudentDashboard user={user} />
+              )}
               {activeView === 'feedback' && <FeedbackView user={user} />}
               {activeView === 'assignments' && <AssignmentsView user={user} />}
               {activeView === 'complaints' && <ComplaintsView user={user} />}
