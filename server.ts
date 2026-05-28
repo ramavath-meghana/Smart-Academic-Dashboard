@@ -49,6 +49,7 @@ const getTodayName = () =>
   new Date().toLocaleDateString("en-US", { weekday: "long" });
 const getErrorMessage = (error: unknown, fallback: string) =>
   error instanceof Error ? error.message : fallback;
+const allowDemoLogin = process.env.ALLOW_DEMO_LOGIN === "true";
 
 async function ensureSchema() {
   await dbPromise.query(`
@@ -254,6 +255,10 @@ app.post("/api/login", (req, res) => {
     (err, results: any) => {
       if (err) {
         console.log("❌ Login query failed:", err);
+        if (allowDemoLogin) {
+          const demoUser = { id, name: role === "teacher" ? "Faculty User" : `Student ${id.slice(-4)}`, role };
+          return res.json({ success: true, user: buildUserPayload(demoUser) });
+        }
         return res.status(503).json({
           success: false,
           message: "Database temporarily unavailable. Please try again shortly.",
@@ -263,52 +268,34 @@ app.post("/api/login", (req, res) => {
 
       const user = results[0];
       if (user) {
-        // Keep demo UX smooth: if role/password differ, align to submitted values.
-        const nextRole = role || String(user.role || "student").toLowerCase();
-        const nextPassword = password || String(user.password || "123");
-        if (
-          String(user.role).toLowerCase() !== nextRole ||
-          String(user.password) !== nextPassword
-        ) {
-          db.query(
-            "UPDATE users SET role = ?, password = ? WHERE id = ?",
-            [nextRole, nextPassword, user.id],
-            (updateErr) => {
-              if (updateErr) {
-                console.log("❌ Login update failed:", updateErr);
-                return res.status(500).json({
-                  success: false,
-                  message: "Could not complete login update.",
-                  details: getErrorMessage(updateErr, "Update failed"),
-                });
-              }
-              const updatedUser = { ...user, role: nextRole, password: nextPassword };
-              return res.json({ success: true, user: buildUserPayload(updatedUser) });
-            }
-          );
-          return;
+        const dbRole = String(user.role || "").toLowerCase();
+        const dbPassword = String(user.password || "");
+
+        if (dbRole !== role) {
+          return res.status(401).json({
+            success: false,
+            message: "Role mismatch for this user ID.",
+          });
+        }
+        if (dbPassword !== password) {
+          return res.status(401).json({
+            success: false,
+            message: "Invalid password.",
+          });
         }
 
         return res.json({ success: true, user: buildUserPayload(user) });
       }
 
-      const name = role === "teacher" ? "Faculty User" : `Student ${id.slice(-4)}`;
-      db.query(
-        "INSERT INTO users (id, name, role, password) VALUES (?, ?, ?, ?)",
-        [id, name, role || "student", password || "123"],
-        (insertErr) => {
-          if (insertErr) {
-            console.log("❌ Login auto-create failed:", insertErr);
-            return res.status(500).json({
-              success: false,
-              message: "Could not create user at this time.",
-              details: getErrorMessage(insertErr, "Insert failed"),
-            });
-          }
-          const newUser = { id, name, role: role || "student", password: password || "123" };
-          return res.json({ success: true, user: buildUserPayload(newUser) });
-        }
-      );
+      if (allowDemoLogin) {
+        const demoUser = { id, name: role === "teacher" ? "Faculty User" : `Student ${id.slice(-4)}`, role };
+        return res.json({ success: true, user: buildUserPayload(demoUser) });
+      }
+
+      return res.status(401).json({
+        success: false,
+        message: "User not found. Please register first.",
+      });
     }
   );
 });
