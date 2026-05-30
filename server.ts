@@ -28,6 +28,7 @@ app.post("/api/login", async (req, res) => {
     .select("*")
     .ilike("id", id)
     .single();
+    
 
   if (error || !user)
     return res.status(401).json({ success: false, message: "User not found." });
@@ -39,19 +40,21 @@ app.post("/api/login", async (req, res) => {
     return res.status(401).json({ success: false, message: "Invalid password." });
 
   return res.json({
-    success: true,
-    user: {
-      id: user.id,
-      name: user.name,
-      role: user.role,
-      department: "Computer Science & Engineering",
-      section: user.role === "student" ? "II B.Tech II Sem CSE - A" : "Faculty",
-      email:
-        user.role === "student"
-          ? `${String(user.id).toLowerCase()}@university.edu`
-          : `${String(user.id).toLowerCase()}@college.edu`,
-    },
-  });
+  success: true,
+  user: {
+    id: user.id,
+    name: user.name,
+    role: user.role,
+    department: user.department || "Computer Science & Engineering",
+    section: user.section || (user.role === "student" ? "II B.Tech II Sem CSE - A" : "Faculty"),
+    email: user.email || (user.role === "student" ? `${String(user.id).toLowerCase()}@university.edu` : `${String(user.id).toLowerCase()}@college.edu`),
+    phone: user.phone || "+91 0000000000",
+    address: user.address || "Not provided",
+    parent_name: user.parent_name || "N/A",
+    parent_phone: user.parent_phone || "N/A",
+    parent_relation: user.parent_relation || "N/A",
+  },
+});
 });
 
 // ---------------- REGISTER STUDENT ----------------
@@ -114,7 +117,7 @@ app.get("/api/student-data/:id", async (req, res) => {
     ] = await Promise.all([
       supabase.from("attendance").select("*").eq("student_id", id),
       supabase.from("marks").select("*").eq("student_id", id),
-      supabase.from("timetable").select("*").eq("student_id", id),
+      supabase.from("timetable").select("*").eq("student_id", id).eq("day", today),
       supabase.from("assignments").select("*").order("due_date"),
     ]);
 
